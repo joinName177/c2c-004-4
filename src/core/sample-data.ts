@@ -1,4 +1,5 @@
-import type { PackingItem, PackingSnapshot } from './models';
+import type { PackingItem, PackingSnapshot, PlannerWorkspace } from './models';
+import { createWorkingResults } from './plan-service';
 
 const seed = (id: string, name: string, category: string, dimensions: [number, number, number], weight: number, priority: 1 | 2 | 3, mustHave = false, fragile = false): PackingItem => ({
   id, name, category, length: dimensions[0], width: dimensions[1], height: dimensions[2], weight, priority, mustHave, fragile,
@@ -16,5 +17,15 @@ export function createSampleSnapshot(): PackingSnapshot {
       seed('book', '旅行读物', '随身', [21, 15, 2], 0.38, 1),
       seed('gifts', '伴手礼预留盒', '预留', [24, 18, 9], 0.2, 1),
     ],
+  };
+}
+
+export function createSampleWorkspace(): PlannerWorkspace {
+  const current = createSampleSnapshot();
+  return {
+    current,
+    committed: JSON.parse(JSON.stringify(current)) as PackingSnapshot,
+    workingResults: createWorkingResults(current.suitcase, current.items),
+    versions: [],
   };
 }

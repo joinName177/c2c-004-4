@@ -1,6 +1,8 @@
 export type Dimensions = Readonly<{ length: number; width: number; height: number }>;
 export type PlanMode = 'minimal' | 'comfort' | 'shopping';
 export type RiskSeverity = 'critical' | 'warning' | 'info';
+export const PLAN_MODES: PlanMode[] = ['minimal', 'comfort', 'shopping'];
+export const PACKING_RULES_VERSION = '2026-10-05.v1';
 
 export interface Suitcase extends Dimensions {
   maxWeight: number;
@@ -34,6 +36,9 @@ export interface PackingPlan {
   capacityRatio: number;
 }
 
+export type PlanSet = Record<PlanMode, PackingPlan>;
+export type RiskSet = Record<PlanMode, Risk[]>;
+
 export interface Risk {
   id: string;
   severity: RiskSeverity;
@@ -42,10 +47,31 @@ export interface Risk {
   itemId?: string;
 }
 
+export interface WorkingResults {
+  plans: PlanSet;
+  risks: RiskSet;
+  rulesVersion: string;
+}
+
 export interface PackingSnapshot {
   suitcase: Suitcase;
   items: PackingItem[];
   selectedPlan: PlanMode;
+}
+
+export interface PlanVersion extends PackingSnapshot {
+  versionId: string;
+  name: string;
+  createdAt: string;
+  source: 'manual' | 'restore-backup' | 'recalculated';
+  results: WorkingResults;
+}
+
+export interface PlannerWorkspace {
+  current: PackingSnapshot;
+  committed?: PackingSnapshot;
+  workingResults?: WorkingResults;
+  versions: PlanVersion[];
 }
 
 export function itemVolume(item: Dimensions): number {
