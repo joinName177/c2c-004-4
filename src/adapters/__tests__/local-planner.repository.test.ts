@@ -16,12 +16,20 @@ describe('LocalPlannerRepository', () => {
   const storage = new MemoryStorage();
   beforeEach(() => storage.clear());
 
-  it('round trips a planning snapshot', () => {
+  it('round trips a planning workspace with frozen versions', () => {
     const repo = new LocalPlannerRepository(storage);
     const sample = createSampleSnapshot();
-    const snapshot = { ...sample, suitcase: { ...sample.suitcase, length: 61 } };
+    const snapshot = { ...sample, suitcase: { ...sample.suitcase, length: 61 }, versions: [] };
     repo.save(snapshot);
     expect(repo.load().value.suitcase.length).toBe(61);
+    expect(repo.load().value.versions).toEqual([]);
+  });
+
+  it('migrates a historical snapshot without a versions list', () => {
+    storage.setItem('c2c-004.planner', JSON.stringify(createSampleSnapshot()));
+    const result = new LocalPlannerRepository(storage).load();
+    expect(result.value.items.length).toBeGreaterThan(0);
+    expect(result.value.versions).toEqual([]);
   });
 
   it('returns sample data when storage is empty', () => {

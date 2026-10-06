@@ -48,6 +48,57 @@ export interface PackingSnapshot {
   selectedPlan: PlanMode;
 }
 
+export interface PlanningVersion {
+  id: string;
+  name: string;
+  createdAt: string;
+  ruleVersion: string;
+  suitcase: Suitcase;
+  items: PackingItem[];
+  selectedPlan: PlanMode;
+  plans: Record<PlanMode, PackingPlan>;
+  risks: Record<PlanMode, Risk[]>;
+  sourceVersionId?: string;
+}
+
+export interface VersionItemChange {
+  itemId: string;
+  name: string;
+  oldName: string;
+  oldWeight: number;
+  newWeight: number;
+  weightDelta: number;
+  attributeDeltas: string[];
+}
+
+export interface VersionPackingDifference {
+  itemId: string;
+  name: string;
+  fromPlaced: boolean;
+  toPlaced: boolean;
+  detail: string;
+}
+
+export interface VersionPlanDiff {
+  mode: PlanMode;
+  fromName: string;
+  toName: string;
+  suitcaseChanges: string[];
+  added: PackingItem[];
+  removed: PackingItem[];
+  changed: VersionItemChange[];
+  packingDifferences: VersionPackingDifference[];
+  weightDelta: number;
+  fromPlacedCount: number;
+  toPlacedCount: number;
+  fromUnplacedCount: number;
+  toUnplacedCount: number;
+}
+
+export interface PlannerWorkspace extends PackingSnapshot {
+  versions: PlanningVersion[];
+}
+
 export function itemVolume(item: Dimensions): number {
   return item.length * item.width * item.height;
 }

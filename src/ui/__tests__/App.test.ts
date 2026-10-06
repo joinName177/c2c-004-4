@@ -55,4 +55,22 @@ describe('Luggage planner App', () => {
     await wrapper.get('[data-testid="print-button"]').trigger('click');
     expect(getPrintCount()).toBe(1);
   });
+
+  it('saves, views and restores a named planning version', async () => {
+    const { wrapper } = render();
+    await wrapper.get('[aria-label="规划版本名称"]').setValue('国庆方案');
+    await wrapper.get('.version-save').trigger('submit');
+    expect(wrapper.text()).toContain('国庆方案');
+
+    await wrapper.get('.version-row button:first-of-type').trigger('click');
+    expect(wrapper.get('[data-testid="version-viewer"]').text()).toContain('冻结物品与摆放结果');
+    expect(wrapper.get('[data-testid="version-viewer"]').text()).toContain('当时风险');
+    await wrapper.get('[aria-label="关闭版本查看"]').trigger('click');
+    expect(wrapper.find('[data-testid="version-viewer"]').exists()).toBe(false);
+
+    await wrapper.get('.version-row button:last-of-type').trigger('click');
+    expect(wrapper.get('[data-testid="restore-dialog"]').text()).toContain('将被替换的当前状态');
+    await wrapper.get('[data-testid="confirm-restore"]').trigger('click');
+    expect(wrapper.text()).toContain('恢复前状态');
+  });
 });

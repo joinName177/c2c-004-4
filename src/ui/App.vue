@@ -12,6 +12,7 @@ import ItemList from './components/ItemList.vue';
 import PackingProjection from './components/PackingProjection.vue';
 import PlanCompare from './components/PlanCompare.vue';
 import RiskPanel from './components/RiskPanel.vue';
+import VersionManager from './components/VersionManager.vue';
 import PrintSheet from './components/PrintSheet.vue';
 
 const props = defineProps<{ repository?: PlannerRepository; printPort?: PrintPort }>();
@@ -36,6 +37,16 @@ const errors = computed(() => validateSuitcase(planner.state.suitcase));
           <RiskPanel :risks="planner.risks.value" />
         </section>
       </div>
+      <VersionManager
+        :versions="planner.versions.value"
+        :viewed-version="planner.viewedVersion.value"
+        :current-preview="planner.currentPreview.value"
+        :stale="planner.isStale.value"
+        @save="planner.saveVersion"
+        @view="planner.viewVersion"
+        @restore="planner.restoreVersion"
+        @recalculate="planner.recalculateVersion"
+      />
       <p class="notice" aria-live="polite">{{ planner.notice.value }}</p>
     </main>
     <PrintSheet :suitcase="planner.state.suitcase" :items="planner.state.items" :plan="planner.currentPlan.value" :risks="planner.risks.value" />
